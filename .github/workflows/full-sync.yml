@@ -1,0 +1,38 @@
+name: Full Sync to Notion
+
+on:
+  # Trigger manually
+  workflow_dispatch:
+  # Trigger on a schedule (e.g., daily at 2 AM UTC)
+#  schedule:
+#    - cron: '0 2 * * *'
+
+jobs:
+  full-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Set environment variables
+      - name: Load environment variables
+        run: |
+          echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+          echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" >> $GITHUB_ENV
+          echo "NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}" >> $GITHUB_ENV
+
+      # Run the full sync script
+      - name: Run full sync
+        run: npm run full-sync
