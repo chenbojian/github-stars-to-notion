@@ -1,3 +1,6 @@
+
+---
+
 # GitHub Stars to Notion
 
 [![English](https://img.shields.io/badge/Language-English-blue)](README.md) [![中文](https://img.shields.io/badge/Language-中文-red)](README-zh.md)
@@ -72,47 +75,49 @@ Before using this tool, ensure you have the following:
    npm run incremental-sync
    ```
 
+---
+
 ### Automated Execution with GitHub Actions
 
-This project includes GitHub Actions workflows for automated syncing:
-
-1. **Full Sync Workflow**:
-   - Runs daily at 2 AM UTC by default.
-   - You can manually trigger it from the GitHub Actions tab.
-
-2. **Incremental Sync Workflow**:
-   - Runs hourly by default.
-   - You can manually trigger it from the GitHub Actions tab.
-
-To set up GitHub Actions:
-1. Go to your repository's **Settings > Secrets and variables > Actions**.
-2. Add the following secrets:
-   - `TOKEN`: Your GitHub Personal Access Token.
-   - `NOTION_TOKEN`: Your Notion Integration Token.
-   - `NOTION_DATABASE_ID`: Your Notion Database ID.
+This project includes GitHub Actions workflows for automated syncing. Follow these steps to set it up:
 
 ---
 
-## Configuration
+#### **Step 1: Fork the Repository**
 
-### Option 1: Use the Predefined Database Template
+1. Visit the project's GitHub page: [github-stars-to-notion](https://github.com/OnlyTL/github-stars-to-notion).
+2. Click the **"Fork"** button in the top-right corner to create a copy of the repository under your GitHub account.
 
-We provide a ready-to-use Notion database template that you can quickly duplicate and integrate into your workspace. Follow these steps:
+---
 
-1. **Duplicate the Template**:
-   - Open the [Notion Database Template](https://evanescent-ballcap-fcf.notion.site/1bc54d7a9d5d804384e8f97a64f42f9d?v=1bc54d7a9d5d81229169000cd251dd11&pvs=4).
-   - Click the "Duplicate" button in the top-right corner of the page.
-   - The duplicated database will be added to your Notion workspace.
+#### **Step 2: Configure Secrets in GitHub Settings**
 
-2. **Share with Your Integration**:
-   - Share the duplicated database with your Notion integration.
-   - Copy the database ID from the URL and paste it into your `.env` file as `NOTION_DATABASE_ID`.
+1. Go to your forked repository on GitHub.
+2. Navigate to **Settings > Secrets and variables > Actions**.
+3. Add the following secrets:
+   - `TOKEN`:
+      - Your GitHub Personal Access Token (requires `repo` scope).
+      - Generate one from [GitHub Developer Settings](https://github.com/settings/tokens).
 
-3. **Start Syncing**:
-   - Run the sync script as described in the [Usage](#usage) section.
+   - `NOTION_TOKEN`:
+      - Your Notion Integration Token.
+      - Generate one from [Notion Developers](https://www.notion.so/my-integrations).
 
-### Option 2: Create Your Own Database
+   - `NOTION_DATABASE_ID`:
+      - The ID of your Notion database.
+      - If using the predefined template, follow the instructions below to extract the database ID.
 
+---
+
+#### **Step 3: Create or Configure the Notion Database**
+
+##### **Option 1: Use the Predefined Database Template**
+1. Open the [Notion Database Template](https://evanescent-ballcap-fcf.notion.site/1bc54d7a9d5d804384e8f97a64f42f9d?v=1bc54d7a9d5d81229169000cd251dd11&pvs=4).
+2. Click the **"Duplicate"** button in the top-right corner to copy the template into your Notion workspace.
+3. Share the duplicated database with your Notion integration by clicking the **"Share"** button and adding your integration.
+4. Extract the database ID from the URL and use it as the value for `NOTION_DATABASE_ID`.
+
+##### **Option 2: Create Your Own Database**
 If you prefer to create your own database, ensure it has the following properties:
 
 | Property Name   | Type           | Description                                      |
@@ -128,7 +133,46 @@ If you prefer to create your own database, ensure it has the following propertie
 | StarTime         | Date           | Time when the repository was starred            |
 | LastUpdated      | Date           | Last updated time of the repository              |
 
-After creating the database, share it with your Notion integration and extract the database ID to use in the `.env` file.
+After creating the database, share it with your Notion integration and extract the database ID.
+
+---
+
+#### **Step 4: Trigger GitHub Actions Sync**
+
+1. **Review Default Workflow Configuration**:
+   - The project includes two predefined GitHub Actions workflow files:
+      - `.github/workflows/full-sync.yml`: Full sync, triggered daily at 2 AM UTC.
+      - `.github/workflows/incremental-sync.yml`: Incremental sync, triggered hourly.
+   - You can modify these files to adjust the schedule if needed.
+
+2. **Manually Trigger Sync**:
+   - Go to the **Actions** tab in your forked repository.
+   - Select the desired workflow (`Full Sync` or `Incremental Sync`) from the left-hand menu.
+   - Click the **"Run workflow"** button to manually trigger the sync task.
+
+3. **View Sync Logs**:
+   - After each run, you can view detailed logs in the GitHub Actions tab.
+   - If the sync fails, the logs will provide error messages to help troubleshoot.
+
+---
+
+#### **Step 5: Verify Sync Results**
+
+1. Open your Notion database and verify that the GitHub starred repositories have been synced successfully.
+2. For incremental sync, only newly starred repositories since the last sync will be added to the database.
+
+---
+
+### Important Notes
+
+- **Token Permissions**: Ensure your GitHub Token and Notion Token have sufficient permissions; otherwise, the sync may fail.
+- **Database Sharing**: Ensure your Notion database is shared with the Notion Integration; otherwise, the script cannot write data.
+- **Cron Schedule**: If you want to adjust the sync frequency, edit the `schedule` field in `.github/workflows/*.yml`. For example:
+  ```yaml
+  schedule:
+    - cron: '0 * * * *'  # Triggers every hour
+  ```
+  Refer to the [GitHub Actions Documentation](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule) for more details about Cron expressions.
 
 ---
 
