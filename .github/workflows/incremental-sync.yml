@@ -40,6 +40,8 @@ jobs:
 
       - name: Keep alive
         run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           date > keepalive.txt
           git add keepalive.txt
           git commit -m "Keep repository alive"
