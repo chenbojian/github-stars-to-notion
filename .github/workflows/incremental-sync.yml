@@ -26,20 +26,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Cache last-sync.json file
-      - name: Cache last-sync.json
-        id: cache-last-sync
-        uses: actions/cache@v3
-        with:
-          path: last-sync.json
-          key: last-sync-cache
-
-      # Initialize last-sync.json if cache is not hit
-      - name: Initialize last-sync.json if not cached
-        if: steps.cache-last-sync.outputs.cache-hit != 'true'
-        run: |
-          LAST_SYNC_TIME=$(date -u -d "-1 day" +"%Y-%m-%dT%H:%M:%S.000Z")
-          echo "{\"lastSyncTime\": \"$LAST_SYNC_TIME\"}" > last-sync.json
 
       # Set environment variables
       - name: Load environment variables

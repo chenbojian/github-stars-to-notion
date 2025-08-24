@@ -5,8 +5,7 @@ import {
   PageObjectResponse,
   UpdatePageParameters,
 } from '@notionhq/client/build/src/api-endpoints.js';
-import path from 'path';
-import fs from 'fs/promises';
+
 import { printProgress } from '../utils/progress.js';
 
 /**
@@ -97,7 +96,6 @@ export const fullSyncRepositoriesToNotion = async (
   }
 };
 
-const LAST_SYNC_FILE = path.resolve(process.cwd(), 'last-sync.json');
 /**
  * Incrementally sync new starred repositories to Notion database
  * @param option - Notion push option
@@ -118,6 +116,7 @@ export const incrementalSyncRepositoriesToNotion = async (
       url: { is_not_empty: true },
     },
   });
+
   // Save Set to quick query
   const existingUrls = new Set(
     existingPages.results
@@ -125,18 +124,21 @@ export const incrementalSyncRepositoriesToNotion = async (
       .map((page) => (page.properties.Link as { url?: string })?.url),
   );
 
-  // Read last sync time
+  // Get last sync time from Notion database
   let lastSyncTime: string | null = null;
-  try {
-    const lastSyncData = await fs.readFile(LAST_SYNC_FILE, {
-      encoding: 'utf-8',
-    });
-    lastSyncTime = JSON.parse(lastSyncData).lastSyncTime;
-  } catch (error) {
-    console.log('No previous sync time found, treating as first sync.', error);
+  if (existingPages.results.length === 0) {
+    throw new Error('No existing pages found in Notion database. Please use full-sync first.');
   }
+  
+  const firstPage = existingPages.results[0] as PageObjectResponse;
+  const starTimeProperty = firstPage.properties.StarTime;
+  
+  if (!starTimeProperty || starTimeProperty.type !== 'date' || !starTimeProperty.date) {
+    throw new Error('StarTime property is empty or invalid in the first page. Please use full-sync first.');
+  }
+  
+  lastSyncTime = starTimeProperty.date.start;
 
-  const currentSyncTime = new Date().toISOString();
   const newRepositories = lastSyncTime
     ? option.repositories.filter(
         (repo) =>
@@ -209,11 +211,5 @@ export const incrementalSyncRepositoriesToNotion = async (
     }
   }
 
-  // Update last sync time
-  await fs.writeFile(
-    LAST_SYNC_FILE,
-    JSON.stringify({ lastSyncTime: currentSyncTime }, null, 2),
-    { encoding: 'utf-8' },
-  );
-  console.log('Updated last sync time:', currentSyncTime);
+  console.log('Incremental sync completed successfully.');
 };

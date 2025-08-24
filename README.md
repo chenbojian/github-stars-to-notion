@@ -180,15 +180,15 @@ After creating the database, share it with your Notion integration and extract t
 
 1. **Fetching Data**:
    - The script fetches your starred repositories from GitHub using the GitHub API.
-   - For incremental sync, it compares the `starred_at` timestamp with the last sync time stored in `last-sync.json`.
+   - For incremental sync, it compares the `starred_at` timestamp with the last sync time retrieved from the Notion database.
 
 2. **Pushing Data to Notion**:
    - The script creates new pages in your Notion database for each repository.
    - It maps repository details (e.g., name, description, topics) to the corresponding Notion properties.
 
 3. **Tracking Last Sync**:
-   - The `last-sync.json` file stores the timestamp of the last successful sync.
-   - This file is persisted using GitHub Actions caching or remote storage (e.g., GitHub Gist).
+   - For incremental sync, the script retrieves the last sync time from the first page in the Notion database.
+   - If no pages exist or the StarTime property is invalid, it will prompt to use full-sync instead.
 
 ---
 
