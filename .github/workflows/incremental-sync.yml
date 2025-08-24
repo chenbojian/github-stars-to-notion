@@ -37,3 +37,10 @@ jobs:
       # Run the incremental sync script
       - name: Run incremental sync
         run: npm run incremental-sync
+
+      - name: Keep alive
+        run: |
+          date > keepalive.txt
+          git add keepalive.txt
+          git commit -m "Keep repository alive"
+          git push
