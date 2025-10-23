@@ -4,8 +4,8 @@ on:
   # Trigger manually
   workflow_dispatch:
   # Trigger on a schedule (e.g., daily at 2 AM UTC)
-  schedule:
-    - cron: '0 2 * * *'
+  # schedule:
+  #   - cron: '0 2 * * *'
 
 jobs:
   incremental-sync:
